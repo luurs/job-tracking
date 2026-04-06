@@ -1,8 +1,10 @@
 package ru.vk.education.job.cli;
 
+import ru.vk.education.job.model.Job;
 import ru.vk.education.job.service.SuggestService;
 import ru.vk.education.job.storage.Storage;
 
+import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,7 +20,9 @@ public class JobListCommandHandler implements CommandHandler {
 
     @Override
     public void handle(String line, Storage storage, SuggestService suggestService) {
-        storage.getJobs().forEach(job -> System.out.println(job.toString()));
+        storage.getJobs().stream()
+                .sorted(Comparator.comparing(Job::getTitle, String.CASE_INSENSITIVE_ORDER))
+                .forEach(System.out::println);
     }
 }
 
