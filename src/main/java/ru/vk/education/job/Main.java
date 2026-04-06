@@ -5,6 +5,7 @@ import ru.vk.education.job.cli.ExitCommandHandler;
 import ru.vk.education.job.cli.HistoryCommandHandler;
 import ru.vk.education.job.cli.JobCommandHandler;
 import ru.vk.education.job.cli.JobListCommandHandler;
+import ru.vk.education.job.cli.StatisticCommandHandler;
 import ru.vk.education.job.cli.SuggestCommandHandler;
 import ru.vk.education.job.cli.UserCommandHandler;
 import ru.vk.education.job.cli.UserListCommandHandler;
@@ -27,6 +28,7 @@ public class Main {
                 new JobCommandHandler(),
                 new JobListCommandHandler(),
                 new SuggestCommandHandler(),
+                new StatisticCommandHandler(),
                 new HistoryCommandHandler(fileService),
                 new ExitCommandHandler()
         );
