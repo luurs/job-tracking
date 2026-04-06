@@ -42,7 +42,7 @@ public class StatisticCommandHandler implements CommandHandler {
     private void handleMatch(Storage storage, int n) {
         storage.getUsers().stream()
                 .filter(user -> countMatches(user, storage) >= n)
-                .sorted(Comparator.comparing(User::getName))
+                .sorted(Comparator.comparing(User::getName, String.CASE_INSENSITIVE_ORDER))
                 .forEach(System.out::println);
     }
 
@@ -62,17 +62,17 @@ public class StatisticCommandHandler implements CommandHandler {
                 .collect(Collectors.groupingBy(skill -> skill, Collectors.counting()))
                 .entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue(Comparator.reverseOrder())
-                        .thenComparing(Map.Entry::getKey))
+                        .thenComparing(Map.Entry::getKey, String.CASE_INSENSITIVE_ORDER))
                 .limit(n)
                 .map(Map.Entry::getKey)
-                .sorted()
+                .sorted(String.CASE_INSENSITIVE_ORDER)
                 .forEach(System.out::println);
     }
 
     private void handleExp(Storage storage, int n) {
         storage.getJobs().stream()
                 .filter(job -> job.getRequiredExperience() >= n)
-                .sorted(Comparator.comparing(Job::getTitle))
+                .sorted(Comparator.comparing(Job::getTitle, String.CASE_INSENSITIVE_ORDER))
                 .forEach(System.out::println);
     }
 }
