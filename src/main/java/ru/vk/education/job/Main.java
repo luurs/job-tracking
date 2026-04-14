@@ -9,12 +9,16 @@ import ru.vk.education.job.cli.StatisticCommandHandler;
 import ru.vk.education.job.cli.SuggestCommandHandler;
 import ru.vk.education.job.cli.UserCommandHandler;
 import ru.vk.education.job.cli.UserListCommandHandler;
+import ru.vk.education.job.service.BestJobFinder;
 import ru.vk.education.job.service.FileService;
 import ru.vk.education.job.service.SuggestService;
 import ru.vk.education.job.storage.Storage;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static void main(String[] args) {
@@ -43,6 +47,21 @@ public class Main {
                 }
             }
         }
+
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        BestJobFinder bestJobFinder = new BestJobFinder(storage, suggestService);
+        scheduler.scheduleAtFixedRate(bestJobFinder, 1, 1, TimeUnit.MINUTES);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            scheduler.shutdown();
+            try {
+                if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                    scheduler.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                scheduler.shutdownNow();
+            }
+        }));
 
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
