@@ -57,9 +57,13 @@ public class Main {
             try {
                 if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
                     scheduler.shutdownNow();
+                    if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                        System.err.println("Scheduler did not terminate");
+                    }
                 }
             } catch (InterruptedException e) {
                 scheduler.shutdownNow();
+                Thread.currentThread().interrupt();
             }
         }));
 
