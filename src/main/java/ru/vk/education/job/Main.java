@@ -9,10 +9,14 @@ import ru.vk.education.job.cli.StatisticCommandHandler;
 import ru.vk.education.job.cli.SuggestCommandHandler;
 import ru.vk.education.job.cli.UserCommandHandler;
 import ru.vk.education.job.cli.UserListCommandHandler;
+import ru.vk.education.job.repository.JobRepository;
+import ru.vk.education.job.repository.UserRepository;
 import ru.vk.education.job.service.BestJobFinder;
 import ru.vk.education.job.service.FileService;
+import ru.vk.education.job.service.JobService;
+import ru.vk.education.job.service.StatisticService;
 import ru.vk.education.job.service.SuggestService;
-import ru.vk.education.job.storage.Storage;
+import ru.vk.education.job.service.UserService;
 
 import java.util.List;
 import java.util.Scanner;
@@ -22,26 +26,31 @@ import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static void main(String[] args) {
-        Storage storage = new Storage();
-        SuggestService suggestService = new SuggestService();
+        UserRepository userRepository = new UserRepository();
+        JobRepository jobRepository = new JobRepository();
+
+        UserService userService = new UserService(userRepository);
+        JobService jobService = new JobService(jobRepository);
+        SuggestService suggestService = new SuggestService(userRepository, jobRepository);
+        StatisticService statisticService = new StatisticService(userRepository, jobRepository);
         FileService fileService = new FileService("commands.txt");
 
         List<CommandHandler> handlers = List.of(
-                new UserCommandHandler(),
-                new UserListCommandHandler(),
-                new JobCommandHandler(),
-                new JobListCommandHandler(),
-                new SuggestCommandHandler(),
-                new StatisticCommandHandler(),
+                new UserCommandHandler(userService),
+                new UserListCommandHandler(userService),
+                new JobCommandHandler(jobService),
+                new JobListCommandHandler(jobService),
+                new SuggestCommandHandler(suggestService),
+                new StatisticCommandHandler(statisticService),
                 new HistoryCommandHandler(fileService),
-                new ExitCommandHandler()
+                new ExitCommandHandler(null)
         );
 
         for (String savedCommand : fileService.getHistory()) {
             if (savedCommand.startsWith("user ") || savedCommand.startsWith("job ")) {
                 for (CommandHandler handler : handlers) {
                     if (handler.supports(savedCommand)) {
-                        handler.handle(savedCommand, storage, suggestService);
+                        handler.handle(savedCommand);
                         break;
                     }
                 }
@@ -49,7 +58,7 @@ public class Main {
         }
 
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        BestJobFinder bestJobFinder = new BestJobFinder(storage, suggestService);
+        BestJobFinder bestJobFinder = new BestJobFinder(userRepository, suggestService);
         scheduler.scheduleAtFixedRate(bestJobFinder, 1, 1, TimeUnit.MINUTES);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -76,7 +85,7 @@ public class Main {
 
             for (CommandHandler handler : handlers) {
                 if (handler.supports(line)) {
-                    handler.handle(line, storage, suggestService);
+                    handler.handle(line);
                     fileService.saveCommand(line);
                     break;
                 }

@@ -1,11 +1,11 @@
 package ru.vk.education.job.cli;
 
+import org.springframework.stereotype.Component;
 import ru.vk.education.job.service.FileService;
-import ru.vk.education.job.service.SuggestService;
-import ru.vk.education.job.storage.Storage;
 
 import java.util.List;
 
+@Component
 public class HistoryCommandHandler implements CommandHandler {
 
     private final FileService fileService;
@@ -20,7 +20,7 @@ public class HistoryCommandHandler implements CommandHandler {
     }
 
     @Override
-    public void handle(String line, Storage storage, SuggestService suggestService) {
+    public void handle(String line) {
         List<String> history = fileService.getHistory();
         if (history.isEmpty()) {
             System.out.println("No commands in history.");

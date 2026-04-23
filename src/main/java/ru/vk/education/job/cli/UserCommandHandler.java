@@ -1,18 +1,25 @@
 package ru.vk.education.job.cli;
 
-import ru.vk.education.job.model.User;
-import ru.vk.education.job.service.SuggestService;
-import ru.vk.education.job.storage.Storage;
+import org.springframework.stereotype.Component;
+import ru.vk.education.job.domain.User;
+import ru.vk.education.job.service.UserService;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
 public class UserCommandHandler implements CommandHandler {
 
     private static final Pattern MAIN_PATTERN = Pattern.compile("^user\\s+(\\S+)(.*)$");
     private static final Pattern ARGUMENT_PATTERN = Pattern.compile("--(skills|exp)=([^\\s]+)");
+
+    private final UserService userService;
+
+    public UserCommandHandler(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public boolean supports(String line) {
@@ -21,7 +28,7 @@ public class UserCommandHandler implements CommandHandler {
     }
 
     @Override
-    public void handle(String line, Storage storage, SuggestService suggestService) {
+    public void handle(String line) {
         Matcher mainMatcher = MAIN_PATTERN.matcher(line);
         if (!mainMatcher.matches()) {
             return;
@@ -56,7 +63,6 @@ public class UserCommandHandler implements CommandHandler {
         }
 
         User user = new User(userName, skills, experience);
-        storage.addUser(user);
+        userService.create(user);
     }
 }
-

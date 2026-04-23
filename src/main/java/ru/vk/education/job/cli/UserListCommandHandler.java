@@ -1,14 +1,21 @@
 package ru.vk.education.job.cli;
 
-import ru.vk.education.job.service.SuggestService;
-import ru.vk.education.job.storage.Storage;
+import org.springframework.stereotype.Component;
+import ru.vk.education.job.service.UserService;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
 public class UserListCommandHandler implements CommandHandler {
 
     private static final Pattern PATTERN = Pattern.compile("^user-list\\s*$");
+
+    private final UserService userService;
+
+    public UserListCommandHandler(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public boolean supports(String line) {
@@ -17,8 +24,7 @@ public class UserListCommandHandler implements CommandHandler {
     }
 
     @Override
-    public void handle(String line, Storage storage, SuggestService suggestService) {
-        storage.getUsers().forEach(user -> System.out.println(user.toString()));
+    public void handle(String line) {
+        userService.list().forEach(user -> System.out.println(user.toString()));
     }
 }
-

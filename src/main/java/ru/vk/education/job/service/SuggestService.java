@@ -1,24 +1,35 @@
 package ru.vk.education.job.service;
 
-import ru.vk.education.job.model.Job;
-import ru.vk.education.job.model.User;
-import ru.vk.education.job.storage.Storage;
+import org.springframework.stereotype.Service;
+import ru.vk.education.job.domain.Job;
+import ru.vk.education.job.domain.User;
+import ru.vk.education.job.repository.JobRepository;
+import ru.vk.education.job.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Service
 public class SuggestService {
 
-    public List<Job> suggest(Storage storage, String userName, int limit) {
-        User user = storage.findUser(userName);
+    private final UserRepository userRepository;
+    private final JobRepository jobRepository;
+
+    public SuggestService(UserRepository userRepository, JobRepository jobRepository) {
+        this.userRepository = userRepository;
+        this.jobRepository = jobRepository;
+    }
+
+    public List<Job> suggest(String userName, int limit) {
+        User user = userRepository.findByName(userName);
         if (user == null) {
             return List.of();
         }
 
         List<JobMatch> jobMatches = new ArrayList<>();
-        for (Job job : storage.getAllJobs()) {
+        for (Job job : jobRepository.findAll()) {
             double score = calculateMatchScore(user, job);
             if (score > 0) {
                 jobMatches.add(new JobMatch(job, score));

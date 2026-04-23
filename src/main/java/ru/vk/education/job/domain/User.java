@@ -1,4 +1,4 @@
-package ru.vk.education.job.model;
+package ru.vk.education.job.domain;
 
 import java.util.Set;
 import java.util.stream.Collectors;

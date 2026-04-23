@@ -1,5 +1,8 @@
 package ru.vk.education.job.service;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,11 +10,12 @@ import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.List;
 
+@Service
 public class FileService {
 
     private final Path filePath;
 
-    public FileService(String fileName) {
+    public FileService(@Value("${history.file:commands.txt}") String fileName) {
         this.filePath = Path.of(fileName);
     }
 
