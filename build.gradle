@@ -14,12 +14,6 @@ java {
 	}
 }
 
-jar {
-    manifest {
-        attributes('Main-Class': 'ru.vk.education.job.Main')
-    }
-}
-
 repositories {
 	mavenCentral()
 }
@@ -27,6 +21,8 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	runtimeOnly 'org.postgresql:postgresql:42.7.3'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.0.3'
 }
